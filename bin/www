@@ -36,6 +36,7 @@ server.on("listening", onListening);
 
 wss.on('connection', ws => {
   ws.on('message', message => {
+    console.log('MESSAGE FROM CLIENT', message);
     ws.send(`Hello from the server, you sent : ${message}`);
   });
   
