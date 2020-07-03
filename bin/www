@@ -7,6 +7,7 @@ const WebSocket = require('ws');
 const app = require("../app");
 const debug = require("debug")("log-dashboard:server");
 const http = require("http");
+const fs = require('fs');
 
 
 /**
@@ -35,9 +36,15 @@ server.on("error", onError);
 server.on("listening", onListening);
 
 wss.on('connection', ws => {
-  ws.on('message', message => {
-    console.log('MESSAGE FROM CLIENT', message);
-    ws.send(`Hello from the server, you sent : ${message}`);
+  ws.on('message', filePath => {
+    fs.watch(filePath, () => {
+      fs.createReadStream(filePath)
+        .on('data', chunk => {
+          const logsArr = chunk.toString().split('\n');
+          const logsStr = logsArr.reverse().join('\n');
+          ws.send(logsStr);
+        });
+    });
   });
   
 });
